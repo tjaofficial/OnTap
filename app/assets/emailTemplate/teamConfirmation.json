@@ -1,0 +1,8 @@
+{
+    "Template": {
+        "TemplateName": "teamConfirmation",
+        "SubjectPart": "OnTap Team Confirmation",
+        "TextPart": "Please confirm you Event Team on the OnTap App using the follow. Team Code: {{teamCode}}, Email:{{email}}",
+        "HtmlPart": "<hmtl>\r\n<head>\r\n<title>Test 1<\/title>\r\n<\/head>\r\n<body>\r\n<h1>here is the body<\/h1>\r\n<\/body>\r\n<\/hmtl>"
+    }
+}

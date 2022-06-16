@@ -1,0 +1,21 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-ontap-staging-71726-authRole",
+      "UnauthRoleArn": "arn:aws:iam::502496922736:role/amplify-ontap-staging-71726-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::502496922736:role/amplify-ontap-staging-71726-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-ontap-staging-71726-deployment",
+      "UnauthRoleName": "amplify-ontap-staging-71726-unauthRole",
+      "StackName": "amplify-ontap-staging-71726",
+      "StackId": "arn:aws:cloudformation:us-east-2:502496922736:stack/amplify-ontap-staging-71726/67f28f00-d5b1-11ec-8ee3-02601f6b733e",
+      "AmplifyAppId": "d2vtlsrcky0554"
+    },
+    "categories": {
+      "auth": {
+        "OnTap": {},
+        "true": {}
+      }
+    }
+  }
+}

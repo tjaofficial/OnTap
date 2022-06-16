@@ -1,0 +1,16 @@
+{
+  "resourceName": "ontap",
+  "policyUUID": "c7751ee4",
+  "bucketName": "ontap68726aa881e54da08792e2b4c686435f",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

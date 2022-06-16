@@ -1,0 +1,104 @@
+type TeamEvents @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  sub: String
+  eventID: ID! @index(name: "byEvent")
+}
+
+type SocialSync @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  sub: String
+  youtubeChannelID: String
+}
+
+type Tickets @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  seller: String
+  hostID: String!
+  event: String!
+  quantity: String!
+  paid: Boolean!
+  emailSent: Boolean!
+  eventID: ID! @index(name: "byEvent")
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  ProfileLinks: [ProfileLinks] @hasMany(indexName: "byUser", fields: ["id"])
+  firstName: String
+  lastName: String
+  bio: String
+  location: String
+  sub: String!
+  PRO: Boolean
+  profileLink: String
+  image: String
+}
+
+type Platform @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String!
+  type: LinkTypeEnum!
+  logo: String!
+  url: String!
+  ProfileLinks: [ProfileLinks] @hasMany(indexName: "byPlatform", fields: ["id"])
+  color: String
+}
+
+enum LinkTypeEnum {
+  MUSIC
+  SOCIAL
+  PAYMENTS
+  CONTACTS
+  MORE
+}
+
+type ProfileLinks @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  link: String!
+  customTitle: String
+  user2ID: ID! @index(name: "byUser")
+  platformID: ID! @index(name: "byPlatform")
+  platformNAME: String
+  platformLOGO: String
+  platformTYPE: String
+  platformColor: String
+}
+
+enum PlatformEnum {
+  TIKTOK
+  TWITCH
+  CLUBHOUSE
+  PINTEREST
+  ZELLE
+  ONTAP
+}
+
+type Venue @model @auth(rules: [{allow: public}]) {
+  name: String!
+  address: String!
+  id: ID!
+  capacity: Int
+  VenueEvents: [Event] @hasMany(indexName: "byVenue", fields: ["id"])
+}
+
+type Event @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  image: String
+  title: String
+  date: AWSDate
+  startTime: AWSTime
+  endTime: AWSTime
+  ticketPrice: Float
+  venueNAME: ID! @index(name: "byVenue")
+  sub: String
+  ticketsSold: Int
+  active: Boolean
+  team: String
+  code: String
+  tickets: [Tickets] @hasMany(indexName: "byEvent", fields: ["id"])
+  TeamEvents: [TeamEvents] @hasMany(indexName: "byEvent", fields: ["id"])
+}
+ 
