@@ -80,22 +80,18 @@ const HomeScreen = ({ navigation }) => {
         const secondFilter = async (x) => {
             const pIdGroups = {}
             const dbPlatform = await DataStore.query(Platform);
-            for (let a=0; a < x.length; a++) {
-                let userLink = x[a];
+            x.forEach(userLink => {
                 let platformId = userLink.platformID;
-                for (let b=0; b < dbPlatform.length; b++){
-                    let pInfo = dbPlatform[b];
+                dbPlatform.forEach(pInfo => {
                     let pType = pInfo.type;
-                    let pID = dbPlatform[b].id;
-                    if (platformId === pID) {
-                        if (pIdGroups.hasOwnProperty(pType)) {
-                            pIdGroups[pType].push(userLink);
-                        } else {
-                            pIdGroups[pType] = [userLink];
-                        }
-                    } 
-                }
-            }
+                    let pID = pInfo.id;
+                    if (platformId === pID && pIdGroups.hasOwnProperty(pType)) {
+                        pIdGroups[pType].push(userLink);
+                    } else if (platformId === pID && !pIdGroups.hasOwnProperty(pType)) {
+                        pIdGroups[pType] = [userLink];
+                    }
+                })
+            })
             setUserLinks(pIdGroups);
             setDataQuery(true);
         }

@@ -3,7 +3,7 @@ import { Alert, View, StyleSheet, Text } from 'react-native';
 import { CustomInput, CustomButton, SocialSignInButtons, Header } from '../../components';
 import { useNavigation } from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
-import Auth from '@aws-amplify/auth';
+import {Auth} from '@aws-amplify/auth';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 

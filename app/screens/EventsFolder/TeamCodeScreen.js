@@ -24,42 +24,35 @@ const TeamCodeScreen = ({navigation}) => {
     }, [])
 
     const save = async () => {
-        for (let i=0; i < events.length; i++) {
-            let event = events[i];
+        events.forEach(event => {
             //Check if the Event Code and the Code entered are the same
             if (event.code === code) {
                 let team = JSON.parse(event.team);
-                for (let x=0; x < team.length; x++) {
-                    let member = team[x];
-                    //check if Member spots have not been claimed
-                    if (member['members'].sub === null) {
-                        // check if emails are the same
-                        if (member['members'].email.toLowerCase() === email.toLowerCase()) {
-                            team[x]['members']['sub'] = String(seller);
-                            team[x]['members']['active'] = true;
-                            const updatedEvent = Event.copyOf(event, updated => {
-                                updated.team = JSON.stringify(team);
-                            });
-                            const TeamLog = new TeamEvents({
-                                sub: seller,
-                                eventID: event.id,
-                            });
-                            await DataStore.save(updatedEvent);
-                            await DataStore.save(TeamLog);
-                            Alert.alert('FOUND IT');
-                            navigation.navigate('EventsScreen', {changeForm: true});
-                        } else {
-                            Alert.alert('EMAIL NOT VALID');
-                        }
-                        
+                team.forEach(async (members) => {
+                    let member = members['members'];
+                    //check if Member spots have not been claimed & check if emails are the same
+                    if (member.sub === null && member.email.toLowerCase() === email.toLowerCase()) {
+                        member.sub = String(seller);
+                        member.active = true;
+                        const updatedEvent = Event.copyOf(event, updated => {
+                            updated.team = JSON.stringify(team);
+                        });
+                        const TeamLog = new TeamEvents({
+                            sub: seller,
+                            eventID: event.id,
+                        });
+                        await DataStore.save(updatedEvent);
+                        await DataStore.save(TeamLog);
+                        Alert.alert('FOUND IT');
+                        navigation.navigate('EventsScreen', {changeForm: true});
                     } else {
-                        Alert.alert('ALL CODES ARE BEING USED, REQUEST A SLOT FROM HOST');
+                        Alert.alert('EMAIL NOT VALID');
                     }
-                }
+                })
             } else {
                Alert.alert('CODE NOT VALID');
             }
-        }    
+        })   
     }
     const back = () => navigation.navigate('EventsScreen', {changeForm: true});
 

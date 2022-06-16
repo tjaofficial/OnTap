@@ -50,7 +50,6 @@ const TicketConfirmScreen = ({navigation}) => {
 
         //if team data passed run this code
         if (eventDetails.team) {
-            console.log('------------------------------');
             console.log('PASS A1-1');
             const team = JSON.parse(eventDetails.team);
             team.forEach( async (data, i) => {

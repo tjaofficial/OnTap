@@ -4,15 +4,13 @@ import { Auth, DataStore, Storage } from 'aws-amplify';
 import { Header, CustomButton } from '../../../components';
 import { Event, User } from '../../../models';
 import { useRoute } from '@react-navigation/core';
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
 
 function AddEventConfirmation({navigation}) {
     const [user, setUser] = useState();
     const [pro, setPro] = useState();
-    const [coverKey, setCoverKey] = useState(null);
-    const [coverUri, setCoverUri] = useState('');
-    const [dataQuery2, setDataQuery2] = useState(false);
 
     const route = useRoute();
     const eventDetails = route.params.prevEventDetails;
@@ -44,47 +42,50 @@ function AddEventConfirmation({navigation}) {
             const filename = uuidv4() + '.png';
             const s3Response = await Storage.put(filename, blob);
 
-            setCoverKey(s3Response.key);
-            setDataQuery2(true);
+            return s3Response.key;
         } catch(e) {
             console.error(e);
         }
+        
     }
 
     const save = async () => {
-        uploadToStorage(file.uri);
-        if (dataQuery2){
-            const authUser = await Auth.currentAuthenticatedUser();
+        console.log('start');
 
-            if (!coverKey) {
-                console.warn('Cover photo not yet uploaded');
-                return;
-            }
-            const parseCover = async (x) => {
-                const response = await Storage.get(x);
-                setCoverUri(response.toString());
-            }
-            try {
-                const newEvent = new Event({
-                    sub: authUser.attributes.sub,
-                    title: eventDetails.title,
-                    date: eventDetails.date,
-                    startTime: eventDetails.startTime,
-                    endTime: eventDetails.endTime,
-                    ticketPrice: parseInt(eventDetails.ticketPrice),
-                    venueNAME: eventDetails.venue.name,
-                    image: coverUri,
-                    ticketsSold: 0,
-                    active: true,
-                });
-            
+        const s3ResponseKey = await uploadToStorage(file.uri);
+        console.log(s3ResponseKey);
+        
+        const authUser = await Auth.currentAuthenticatedUser();
 
-                await DataStore.save(newEvent);
-                navigation.navigate('EventsScreen', {changeForm: true});
-            } catch(e) {
-                console.error(e);
-            }
+        if (!s3ResponseKey) {
+            console.warn('Cover photo not yet uploaded');
+            return;
         }
+
+        const response = await Storage.get(s3ResponseKey);
+        const coverUri = response.toString();
+        
+
+        try {
+            const newEvent = new Event({
+                sub: authUser.attributes.sub,
+                title: eventDetails.title,
+                date: eventDetails.date,
+                startTime: eventDetails.startTime,
+                endTime: eventDetails.endTime,
+                ticketPrice: parseInt(eventDetails.ticketPrice),
+                venueNAME: eventDetails.venue.name,
+                image: coverUri,
+                ticketsSold: 0,
+                active: true,
+            });
+        
+            await DataStore.save(newEvent);
+            navigation.navigate('EventsScreen', {changeForm: true});
+        } catch(e) {
+            console.error(e);
+        }
+        
     }
 
     const addTeam = async () => {
