@@ -44,7 +44,6 @@ const ConfirmEmailScreen = () => {
     
     return (
         <View style={styles.background}>
-            <Header text='Confirm email' />
             <ScrollView>
                 <View style={styles.bodyContianer}>
                     <Text style={styles.title}>

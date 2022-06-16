@@ -108,15 +108,7 @@ function OnTapProScreen({navigation}) {
                     <CustomButton
                         text='Go Back'
                         type='SecondaryDark'
-                        onPress={
-                            () => navigation.navigate('Tabs', { 
-                                screen: 'HomeStackScreen', params: { 
-                                    screen: 'SettingsStackScreen', params: {
-                                        screen: 'SettingsScreen'
-                                    }
-                                }
-                            })
-                        }
+                        onPress={() => navigation.goBack()}
                         
                     />
                 </View>

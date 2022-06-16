@@ -29,7 +29,6 @@ const NewPasswordScreen = () => {
     
     return (
         <View style={styles.background}>
-            <Header text='Reset Password' adjustment={183} />
             <ScrollView>
                 <View style={styles.bodyContianer}>
                     <Text style={styles.title}>

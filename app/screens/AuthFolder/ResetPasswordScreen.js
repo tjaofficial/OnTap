@@ -25,7 +25,6 @@ const ResetPasswordScreen = () => {
     
     return (
         <View style={styles.background}>
-            <Header text='Reset Password' adjustment={183} />
             <View style={{flex:1, justifyContent: 'center' }}>
                 <View style={styles.bodyContianer}>
                     <Text style={styles.title}>
