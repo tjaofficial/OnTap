@@ -15,9 +15,6 @@ const EditProfileScreen = ({navigation}) => {
     const [profileLink, setProfileLink] = useState('');
     const [value, setValue] = useState('checking value...');
     const [image, setImage] = useState(null);
-    const [dataQuery2, setDataQuery2] = useState(false);
-    const [coverKey, setCoverKey] = useState(null);
-    const [coverUri, setCoverUri] = useState('');
 
     const goAddLink = () => navigation.navigate('AddLinkScreen')
 
@@ -57,45 +54,47 @@ const EditProfileScreen = ({navigation}) => {
     }
 
     const save = async () => {
-        uploadToStorage(image.uri);
-        if (dataQuery2){
-            if (!isValid()) {
-                return;
-            }
-            const parseCover = async (x) => {
-                const response = await Storage.get(x);
-                setCoverUri(response.toString());
-            }
-            parseCover(coverKey);
-            if (user) {
-                const updatedUser = User.copyOf(user, updated => {
-                    updated.firstName = firstName;
-                    updated.lastName = lastName;
-                    updated.profileLink = profileLink;
-                    updated.bio = bio;
-                    updated.location = location;
-                    updated.image = coverUri;
-                });
-                await DataStore.save(updatedUser);
-            } else {
-                const authUser = await Auth.currentAuthenticatedUser();
-
-                const newUser = new User({
-                    sub: authUser.attributes.sub,
-                    firstName,
-                    lastName,
-                    profileLink,
-                    bio,
-                    location,
-                    image: coverUri,
-                });
-
-                await DataStore.save(newUser);
-            }
-
-            Alert.alert('User Saved Successfully')
-            navigation.navigate('HomeScreen', {changeForm: true});
+        if (!isValid()) {
+            return;
         }
+        const s3ResponseKey = await uploadToStorage(image.uri);
+
+        if (!s3ResponseKey) {
+            console.warn('Cover photo not yet uploaded');
+            return;
+        }
+
+        const response = await Storage.get(s3ResponseKey);
+        const coverUri = response.toString();
+
+        if (user) {
+            const updatedUser = User.copyOf(user, updated => {
+                updated.firstName = firstName;
+                updated.lastName = lastName;
+                updated.profileLink = profileLink;
+                updated.bio = bio;
+                updated.location = location;
+                updated.image = coverUri;
+            });
+            await DataStore.save(updatedUser);
+        } else {
+            const authUser = await Auth.currentAuthenticatedUser();
+
+            const newUser = new User({
+                sub: authUser.attributes.sub,
+                firstName,
+                lastName,
+                profileLink,
+                bio,
+                location,
+                image: coverUri,
+            });
+
+            await DataStore.save(newUser);
+        }
+
+        Alert.alert('User Saved Successfully')
+        navigation.navigate('HomeScreen', {changeForm: true});
     };
 
         
@@ -128,8 +127,7 @@ const EditProfileScreen = ({navigation}) => {
             const filename = uuidv4() + '.png';
             const s3Response = await Storage.put(filename, blob);
 
-            setCoverKey(s3Response.key);
-            setDataQuery2(true);
+            return s3Response.key;
         } catch(e) {
             console.error(e);
         }
