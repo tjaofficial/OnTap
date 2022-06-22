@@ -15,8 +15,8 @@ const AddEventCover = ({navigation}) => {
     const save = async () => {
         //if (!isValid()) {
         //    return;
-        //}
-        prevEventDetails['image'] = image;
+        //}MKAE SURE YOU CHANGE THIS MAKE SURE YOU CHANGE THIS MAKE SURE YOU CHANGE THIS
+        prevEventDetails['image'] = 'https://picsum.photos/200/300';
         console.log(prevEventDetails);
         navigation.navigate('AddEventConfirmation', {prevEventDetails: prevEventDetails, file: image});
     };

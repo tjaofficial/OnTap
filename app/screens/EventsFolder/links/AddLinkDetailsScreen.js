@@ -62,7 +62,7 @@ const AddLinkDetailsScreen = ({navigation}) => {
         const newLink = new ProfileLinks({
             link: String(link),
             customTitle: title,
-            user2ID: user.id,
+            user2ID: user.sub,
             platformID: platform.id,
             platformNAME: text,
             platformLOGO: logo,

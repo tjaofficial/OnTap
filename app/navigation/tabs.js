@@ -4,7 +4,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { AddLinkScreen, UserLinkDetailScreen, AddLinkDetailsScreen } from '../screens/EventsFolder/links';
 import { AddEventCover, AddEventName, AddEventDateTime, AddEventVenue, AddEventNewVenue, AddEventTicket, AddEventConfirmation } from '../screens/EventsFolder/events';
-import { BuyTicketsScreen, TicketConfirmScreen, TicketConfirmationScreen } from '../screens/EventsFolder/tickets';
+import { BuyTicketsScreen, TicketConfirmScreen, TicketConfirmationScreen, PaymentScreen } from '../screens/EventsFolder/tickets';
 import { EventsScreen, AnalyticsListScreen, AnalyticsScreen, TeamCodeScreen } from '../screens/EventsFolder';
 import { SocialSyncScreen, SyncYoutube } from '../screens/HomeFolder/sync';
 
@@ -21,6 +21,7 @@ import Icon2 from 'react-native-vector-icons/Entypo';
 import Icon3 from 'react-native-vector-icons/FontAwesome';
 import Icon4 from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/Octicons';
+
 
 
 const SettingsStack = createStackNavigator();
@@ -75,6 +76,7 @@ const EventsStackScreen = () => (
         <EventsStack.Screen name='TicketConfirmScreen' component={TicketConfirmScreen} options={{headerShown: false,}} />
         <EventsStack.Screen name='TicketConfirmationScreen' component={TicketConfirmationScreen} options={{headerShown: false,}} />
         <EventsStack.Screen name='TeamCodeScreen' component={TeamCodeScreen} options={{headerShown: false,}} />
+        <EventsStack.Screen name='PaymentScreen' component={PaymentScreen} options={{headerShown: false,}} />
     </EventsStack.Navigator>
 )
 

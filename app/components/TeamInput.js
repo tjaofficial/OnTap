@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import { Alert, View, StyleSheet, Text, TextInput, Pressable } from 'react-native';
 import { Auth, DataStore } from 'aws-amplify';
-import { Event } from '../models';
+import { Event, User } from '../models';
 import { useRoute } from '@react-navigation/core';
 import CustomButton from './CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { sendEmail } from '../../email_send';
+import { setUserDataAsync } from 'expo-facebook';
 
 const TeamInput = () => {
     const navigation = useNavigation();
@@ -16,7 +17,8 @@ const TeamInput = () => {
     const changeForm = false;
     const [teamList, setTeamList] = useState([{ sellerName: '', email: ''}]);
     const [event, setEvent] = useState('');
-    const today = String(new Date()).substring(4,15)
+    const today = String(new Date()).substring(4,15);
+    const [user, setUser] = useState();
     
 
     
@@ -27,9 +29,15 @@ const TeamInput = () => {
         }
 
         const getEvent = async () => {
+            const dbAuth = await Auth.currentAuthenticatedUser();
+            const dbUser = await DataStore.query(User, x => x.sub('eq', dbAuth.attributes.sub));
             const dbEvent = await DataStore.query(Event, c => 
                 c.title('eq', eventTitle).active('eq', true)    
             );
+            if (dbUser.length === 0) {
+                return;
+            }
+            setUser(dbUser[0]);
             setEvent(dbEvent[0]);
             setDataQuery(true);
         }
@@ -74,17 +82,21 @@ const TeamInput = () => {
 
         const random = makeid();
 
-        const teamData = []
+        const teamData = [];
+
         for( let i=0; i < teamList.length; i++ ) {
             let seller = teamList[i];
             const name = seller.sellerName.text;
             const email = seller.email.text.toLowerCase();
-            teamData.push(
-                {'members':
-                    {'name': name, 'email': email,'sub': null, 'sold': 0, active: false, today: null, todaySold: 0}
-                }
-            );
+            if (teamData.length === 0) {
+                teamData.push({'members': [{'name': name, 'email': email,'sub': null, 'sold': 0, active: false, today: null, todaySold: 0}]});
+            } else {
+                teamData[0].members.push({'name': name, 'email': email,'sub': null, 'sold': 0, active: false, today: null, todaySold: 0});
+            }
             sendEmail(String(email), String(name), random);
+        }
+        if (!teamData[0].host){
+            teamData.push({'host': {'sold': 0, today: null, todaySold: 0}});
         }
 
         if (prevEventDetails.id) {

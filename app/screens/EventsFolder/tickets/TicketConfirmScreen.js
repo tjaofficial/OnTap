@@ -52,39 +52,55 @@ const TicketConfirmScreen = ({navigation}) => {
         if (eventDetails.team) {
             console.log('PASS A1-1');
             const team = JSON.parse(eventDetails.team);
-            team.forEach( async (data, i) => {
-                let member = data['members'];
-                if (member.sub === seller) {
-                    console.log('PASS A2');
-                    let prevSold = member.sold;
-                    let prevToday = member.today;
-                    let prevTodaySold = member.todaySold;
-                    member.sold = parseInt(prevSold) + parseInt(quantity);
-                    if (prevToday === today) {
-                        console.log('PASS A3-1');
-                        member.todaySold = parseInt(prevTodaySold) + parseInt(quantity);
-                    } else {
-                        console.log('PASS A3-2');
-                        member.today = today;
-                        member.todaySold = parseInt(quantity);
-                    }
-                    let teamFinal = JSON.stringify(team);
-                    let soldFinal = parseInt(eventDetails.ticketsSold) + parseInt(quantity);
-                    const updateEvent = Event.copyOf(eventDetails, updated => {
-                        updated.ticketsSold = soldFinal;
-                        updated.team = teamFinal;
-                    });
-
-                    setDataQuery2(true);
-                    if (dataQuery2) {
-                        console.log('WE MADE IT!');
-                        await DataStore.save(newTicketPurchase);
-                        await DataStore.save(updateEvent);
-                        navigation.navigate('TicketConfirmationScreen');
-                    }
-
+            //Check if this is the host selling
+            if (eventDetails.sub === seller) {
+                let sellerSold = team[1].host.sold;
+                let sellerToday = team[1].host.today;
+                let sellerTodaySold = team[1].host.todaySold;
+                team[1].host.sold = parseInt(sellerSold) + parseInt(quantity);
+                if (sellerToday === today) {
+                    console.log('PASS A3-1');
+                    team[1].host.todaySold = parseInt(sellerTodaySold) + parseInt(quantity);
+                } else {
+                    console.log('PASS A3-2');
+                    team[1].host.today = today;
+                    team[1].host.todaySold = parseInt(quantity);
                 }
+            } else {
+                //This is if a team member is selling
+                team[0].members.forEach( async (member, i) => {
+                    if (member.sub === seller) {
+                        console.log('PASS A2');
+                        let prevSold = member.sold;
+                        let prevToday = member.today;
+                        let prevTodaySold = member.todaySold;
+                        member.sold = parseInt(prevSold) + parseInt(quantity);
+                        if (prevToday === today) {
+                            console.log('PASS A3-1');
+                            member.todaySold = parseInt(prevTodaySold) + parseInt(quantity);
+                        } else {
+                            console.log('PASS A3-2');
+                            member.today = today;
+                            member.todaySold = parseInt(quantity);
+                        }
+                    }
+                });
+            }
+            //Update team and event details
+            let teamFinal = JSON.stringify(team);
+            let soldFinal = parseInt(eventDetails.ticketsSold) + parseInt(quantity);
+            const updateEvent = Event.copyOf(eventDetails, updated => {
+                updated.ticketsSold = soldFinal;
+                updated.team = teamFinal;
             });
+
+            setDataQuery2(true);
+            if (dataQuery2) {
+                console.log('WE MADE IT!');
+                await DataStore.save(newTicketPurchase);
+                await DataStore.save(updateEvent);
+                navigation.navigate('TicketConfirmationScreen');
+            }
         } else {
             console.log('PASS 1-2');
             //update events total number of tickets sold
@@ -101,7 +117,7 @@ const TicketConfirmScreen = ({navigation}) => {
 
     return (
         <View style={styles.background}>
-            <Header text='Confirm Tickets' />
+            <Header text='Send Tickets' />
             <View style={styles.bodyContianer}>
                 <View style={styles.extraInfo}>
                     <TextInput 

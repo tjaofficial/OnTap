@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { DataStore } from 'aws-amplify';
+import { Auth, DataStore } from 'aws-amplify';
 import { useRoute } from '@react-navigation/core';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { Event, Tickets } from '../../models';
+import { Event, Tickets, User } from '../../models';
 import { Header } from '../../components';
 import Icon from 'react-native-vector-icons/Octicons';
 import Email from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,13 +21,20 @@ const AnalyticsScreen = ({navigation}) => {
     const [dataQuery, setDataQuery] = useState(false);
     const [refreshing, setRefreshing] = React.useState(false);
     const [addTeam, setAddTeam] = useState(true);
+    const [user, setUser] = useState();
   
    
 
     useEffect(() => {
         const getTicketsSold = async () => {
+            const dbAuth = await Auth.currentAuthenticatedUser();
+            const dbUser = await DataStore.query(User, x => x.sub('eq', dbAuth.attributes.sub));
             const dbEventTickets = await DataStore.query(Tickets, c => c.hostID('eq', eventID));
             
+            if (dbUser.length === 0) {
+                return;
+            }
+            setUser(dbUser[0]);
             setTickets(dbEventTickets);
             setDataQuery(true);
         }
@@ -47,17 +54,18 @@ const AnalyticsScreen = ({navigation}) => {
 
     const deleteSeller = async (index) => {
         console.log(teamData.length);
-        if (teamData.length === 1) {
+        if (teamData[0].members.length === 1) {
             console.log('there only one');
+            teamData[0]['members'] = [];
             const updatedTeam = Event.copyOf(event, updated => {
-                updated.team = null;
+                updated.team = teamData;
                 updated.code = null;
             });
             await DataStore.save(updatedTeam);
             setAddTeam(true);
         } else if (teamData.length > 1){
             console.log(index);
-            teamData.splice(index, 1)
+            teamData[0].members.splice(index, 1)
             const newTeam = JSON.stringify(teamData);
             const updatedTeam = Event.copyOf(event, updated => {
                 updated.team = newTeam;
@@ -92,14 +100,26 @@ const AnalyticsScreen = ({navigation}) => {
                                 <Text style={styles.headerRight}>Total</Text>
                             </View>
                             <View style={styles.sellersCont}>
-                            {!addTeam ? teamData.map ((item, index) => {
-                                return <View key={item['members'].email} style={styles.sellerCont}>
-                                    <Icon name='dot-fill' size={25} color={item['members'].active ? 'green' : 'white'} style={styles.active}/>
-                                    <Text style={styles.sellerText}>{item['members'].name}</Text>
-                                    <Text style={styles.todayText}>+{item['members'].todaySold}</Text>
-                                    <Text style={styles.totalText}>{item['members'].sold}</Text>
+                                <View style={styles.sellerCont}>
+                                <Icon name='dot-fill' size={25} color='white' style={[styles.active, {opacity: 0.0,}]} />
+                                    <Text style={styles.sellerText}>Host</Text>
+                                    <Text style={styles.todayText}>+{teamData[1].host.todaySold}</Text>
+                                    <Text style={styles.totalText}>{teamData[1].host.sold}</Text>
+                                    <TouchableOpacity style={{flex:.5, alignItems: 'flex-end',}}>
+                                        <Email name='email-send-outline' size={20} color='white' style={[styles.emailSend, {opacity: 0.0,}]}/>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{flex:.5, alignItems: 'flex-end', marginLeft: 10}}>
+                                        <Remove name='remove' size={20} color='white' style={[styles.emailSend, {opacity: 0.0,}]} />
+                                    </TouchableOpacity>
+                                </View>
+                            {!addTeam ? teamData[0].members.map ((item, index) => {
+                                return <View key={item.email} style={styles.sellerCont}>
+                                    <Icon name='dot-fill' size={25} color={item.active ? 'green' : 'white'} style={styles.active}/>
+                                    <Text style={styles.sellerText}>{item.name}</Text>
+                                    <Text style={styles.todayText}>+{item.todaySold}</Text>
+                                    <Text style={styles.totalText}>{item.sold}</Text>
                                     <TouchableOpacity style={{flex:.5, alignItems: 'flex-end'}}>
-                                        <Email name='email-send-outline' size={20} color='white' style={styles.emailSend} onPress={ () => resend(item['members'])} />
+                                        <Email name='email-send-outline' size={20} color='white' style={styles.emailSend} onPress={ () => resend(item)} />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={{flex:.5, alignItems: 'flex-end', marginLeft: 10}} onPress={() => deleteSeller(index)}>
                                         <Remove name='remove' size={20} color='white' style={styles.emailSend} />

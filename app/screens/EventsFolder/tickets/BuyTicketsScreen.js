@@ -5,7 +5,7 @@ import Icon1 from 'react-native-vector-icons/AntDesign';
 import Icon2 from 'react-native-vector-icons/AntDesign';
 import { Auth, DataStore } from 'aws-amplify';
 import { Header, CustomButton, LinkButton } from '../../../components';
-import { User } from '../../../models';
+import { ProfileLinks, User } from '../../../models';
 
 const BuyTicketsScreen = ({navigation}) => {
     const route = useRoute();
@@ -16,6 +16,7 @@ const BuyTicketsScreen = ({navigation}) => {
     const [dataQuery, setDataQuery] = useState(false);
     const [quantity, setQuantity] = useState('');
     const [pro, setPro] = useState();
+    const [links, setLinks] = useState();
     const [host, setHost] = useState(true);
     
     const goPro = () => navigation.navigate('OnTapProScreen');
@@ -24,10 +25,12 @@ const BuyTicketsScreen = ({navigation}) => {
         const getCurrentUser = async () => {
             const dbAuth = await Auth.currentAuthenticatedUser(); 
             const dbUsers = await DataStore.query(User, x => x.sub('eq', dbAuth.attributes.sub));
+            const dbLinks = await DataStore.query(ProfileLinks, c => c.user2ID('eq', dbAuth.attributes.sub));
             if (eventDetails.sub !== dbAuth.attributes.sub) {
                 setHost(false);
             }
-
+            paymentDisplay(dbLinks)
+            //setLinks(dbLinks);
             setPro(dbUsers[0].PRO);
             setDataQuery(true);
         }
@@ -84,6 +87,26 @@ const BuyTicketsScreen = ({navigation}) => {
         }
     }
 
+    const paymentDisplay = (links) => {
+        const paymentsObject = {};
+        links.forEach(link => {
+            if (link.platformID === 'cb40af25-4f1e-4e7d-9970-12fa6c1c977e'){
+                paymentsObject['paypal'] = link;
+            }
+            if (link.platformID === 'ac3e679e-7669-4296-a4f1-86036918171b'){
+                paymentsObject['cashapp'] = link;
+            }
+            if (link.platformID === '29e15378-5300-4e66-9eed-32dc2bdffcdb'){
+                paymentsObject['venmo'] = link;
+            }
+            if (link.platformID === 'something'){
+                paymentsObject['something'] = link;
+            }
+        })
+        
+        setLinks(paymentsObject);
+        
+    }
 
     return (
         <View style={styles.background}>
@@ -186,27 +209,32 @@ const BuyTicketsScreen = ({navigation}) => {
                             </View>
                         </View>
                     </View>
-                    <View style={styles.extraInfo}>
-                        <LinkButton
-                            title='PayPal'
-                            logo='paypal'
-                        />
-                        <LinkButton
-                            title='CashApp'
-                            logo='cashapp'
-                        />
-                        <LinkButton
-                            title='Venmo'
-                            logo='venmo'
-                        />
-                    </View>
+                    {Object.keys(links).length !== 0 ? <View style={styles.extraInfo}>
+                        {links.paypal ? <LinkButton
+                            title={links.paypal.platformNAME}
+                            logo={links.paypal.platformLOGO}
+                            onPress={() => navigation.navigate('PaymentScreen', {linkInfo: links.paypal, eventDetails: eventDetails, quantity: quantity})}
+                        /> : <></> }
+                        {links.cashapp ? <LinkButton
+                            title={links.cashapp.platformNAME}
+                            logo={links.cashapp.platformLOGO}
+                            onPress={() => navigation.navigate('PaymentScreen', {linkInfo: links.cashapp, eventDetails: eventDetails, quantity: quantity})}
+                        /> : <></> }
+                        {links.venmo ? <LinkButton
+                            title={links.venmo.platformNAME}
+                            logo={links.venmo.platformLOGO}
+                            onPress={() => navigation.navigate('PaymentScreen', {linkInfo: links.venmo, eventDetails: eventDetails, quantity: quantity})}
+                        /> : <></> }
+                    </View> : <View style={styles.extraInfo}>
+                        <Text style={{color:'white'}}>Please Add Payment Links</Text>
+                    </View> }
                     <View style={styles.extraInfo}>
                         <CustomButton 
                             text='Confirm'
                             onPress={goConfirm}
                             type="Primary"
                         />
-                    </View>
+                    </View> 
                 </View> : <ActivityIndicator /> }
             </ScrollView>
         </View>

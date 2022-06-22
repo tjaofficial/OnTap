@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { Header, CustomButton } from '../../components';
 import QRCode from 'react-native-qrcode-svg';
 import {Auth, DataStore} from 'aws-amplify';

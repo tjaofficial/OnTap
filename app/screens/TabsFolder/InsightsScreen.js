@@ -3,7 +3,6 @@ import { View, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-nati
 import { Header, SocialGrowthBar } from '../../components';
 import {Auth, DataStore} from 'aws-amplify';
 import { User } from '../../models';
-import getYoutubeChannelId from 'get-youtube-channel-id';
 import YoutubeCounter from '../../components/youtube/YoutubeCounter';
 
 const InsightsScreen = ({navigation}) => {
@@ -29,7 +28,27 @@ const InsightsScreen = ({navigation}) => {
     
     const goPro = () => navigation.navigate('OnTapProScreen');
 
-    const subs =YoutubeCounter();
+    const subs = YoutubeCounter();
+
+    const tokens = {
+        consumer_key: 'v7UmfXTkRv56sXERZN5WzBuuW',
+        consumer_secret: 'wTm20U4goDP48Qq269EmdtHmVDIjcckYx41fHI6q9tdZAcoVQI',
+        access_token_key: '226525350-',
+        access_token_secret: 'y5Uw8VJGXeYoH5HsWr5rcwjcixMN5SBlPQw9gc2s',
+        bearer_token: 'AAAAAAAAAAAAAAAAAAAAAKN7dgEAAAAANdBg1x6Nppuy9W99YSa7MTwiqHk%3DwTn24c2Qx2oupnUvTzSbeQx5V6YfPRB6fGAfsm5KIrNguPT4x3'
+    };
+    
+
+    //var T = new twit({
+    //consumer_key: consumer_key,
+    //consumer_secret: consumer_secret,
+    //access_token: access_token_key,
+    //access_token_secret: access_token_secret,
+    //})
+
+    //T.get('followers/ids', { screen_name: 'tjaofficial' },  function (err, data, response) {
+    //    console.log(data)
+    //})
     return (
         <View style={styles.background}>
             <Header text='Insights' />

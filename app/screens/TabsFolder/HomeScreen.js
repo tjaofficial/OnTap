@@ -50,9 +50,9 @@ const HomeScreen = ({ navigation }) => {
                         page: 0,
                         limit: 15,
                     });
-                    const dbUserID = dbUsers[0].id;
+                    const dbUserSub = dbUsers[0].sub;
                     //console.log(dbUserID + "<--------THIS ONE RIGHT HERE");
-                    const comments = await DataStore.query(ProfileLinks, c => c.user2ID('eq', dbUserID), {
+                    const comments = await DataStore.query(ProfileLinks, c => c.user2ID('eq', dbUserSub), {
                         page: 0,
                         limit: 15,
                     });
